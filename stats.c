@@ -8,6 +8,7 @@
 #include "loader.h"
 #include <assert.h>
 #include "worker.h"
+#include "communication.h"
 
 pthread_mutex_t stats_lock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -95,6 +96,12 @@ double findQuantile(struct stat* stat, double quantile) {
 
 }//End findQuantile()
 
+void resetStats(){
+    memset(&global_stats, 0, sizeof(struct memcached_stats));
+    global_stats.response_time.min = 1000000;
+    global_stats.last_time = currentTime;
+}
+
 void printGlobalStats(struct config* config) {
 
   pthread_mutex_lock(&stats_lock);
@@ -111,6 +118,7 @@ void printGlobalStats(struct config* config) {
   printf("%10f, %9.1f,  %10d, %10d, %10d, %10d, %10d, %10f, %10f, %10f, %10f, %10f, %10f, %10f, %10f\n", 
 		timeDiff, rps, global_stats.requests, global_stats.gets, global_stats.sets, global_stats.hits, global_stats.misses,
 		1000*getAvg(&global_stats.response_time), 1000*q90, 1000*q95, 1000*q99, 1000*std, 1000*global_stats.response_time.min, 1000*global_stats.response_time.max, getAvg(&global_stats.get_size));
+
   int i;
   printf("Outstanding requests per worker:\n");
   for(i=0; i<config->n_workers; i++){
@@ -118,9 +126,7 @@ void printGlobalStats(struct config* config) {
   } 
   printf("\n");
   //Reset stats
-  memset(&global_stats, 0, sizeof(struct memcached_stats));
-  global_stats.response_time.min = 1000000;
-  global_stats.last_time = currentTime;
+  resetStats();
 
   checkExit(config);
   pthread_mutex_unlock(&stats_lock);
@@ -146,4 +152,35 @@ void statsLoop(struct config* config) {
 
 
 }//End statisticsLoop()
+
+
+
+void ipcStatsLoop(struct config* config){
+
+    printf("Entering statsLoop\n");
+    pthread_mutex_lock(&stats_lock);
+    gettimeofday(&start_time, NULL);
+    pthread_mutex_unlock(&stats_lock);
+    char command;
+
+    sleep(2);
+    while(1){
+        command = rlAgentCommand(); // blocking call
+        pthread_mutex_lock(&stats_lock);
+        switch (command) {
+            case 'u':
+                resetStats();
+                printf("Start Recording\n");
+                // send ack ?
+                break;
+            case 'd':
+                printf("Stop Recording\n");
+                //calcStats();
+                // send stats
+                break;
+        }
+        checkExit(config);
+        pthread_mutex_unlock(&stats_lock);
+    }
+} // End ipcStatsLopp
 

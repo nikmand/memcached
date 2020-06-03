@@ -199,13 +199,13 @@ struct dep_dist* loadDepFile(struct config* config) {
     i--;
     avg_size+=entry->size;
   }//End while()
-//  avg_size = avg_size/lines;
-//  config->keysToPreload = floor(1024.0*1024*config->server_memory/(avg_size+150));
-//  if(config->keysToPreload>lines) config->keysToPreload=lines-1;
-//  fclose(file);
-//#ifdef FLEXUS
-//  MAGIC2(200, 0);
-//#endif
+  avg_size = avg_size/lines;
+  config->keysToPreload = floor(1024.0*1024*config->server_memory/(avg_size+150));
+  if(config->keysToPreload>lines) config->keysToPreload=lines-1;
+  fclose(file);
+#ifdef FLEXUS
+  MAGIC2(200, 0);
+#endif
   return dist;
 }
 

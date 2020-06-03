@@ -65,6 +65,7 @@ void addSample(struct stat* stat, float sample);
 double getAvg(struct stat* stat);
 double getStdDev(struct stat* stat);
 void statsLoop(struct config* config);
+void ipcStatsLoop(struct config* config);
 
 
 #endif

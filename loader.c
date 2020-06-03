@@ -83,8 +83,8 @@ struct config* parseArgs(int argc, char** argv) {
     switch (c) {
 
       case 'a':
-	config->input_file=calloc(strlen(optarg)+1, sizeof(char));
-  	strcpy(config->input_file, optarg);	
+	    config->input_file=calloc(strlen(optarg)+1, sizeof(char));
+  	    strcpy(config->input_file, optarg);
         break;
 
       case 'c':
@@ -185,8 +185,8 @@ struct config* parseArgs(int argc, char** argv) {
         break;
       
       case 'S':
-	config->scaling_factor=atoi(optarg);
-	break;
+	    config->scaling_factor=atoi(optarg);
+	    break;
       
       case 't':
         config->run_time = atoi(optarg);     
