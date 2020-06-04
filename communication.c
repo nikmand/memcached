@@ -4,12 +4,13 @@
 
 #include "communication.h"
 
-int sockfd;
+int sockfd, client_socket, read_size;
 char buffer[1024] = {0};
 struct sockaddr_in address;
 int addrlen = sizeof(address);
 
-void initCommunication(){
+int initCommunication(){
+
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("socket failed");
         exit(EXIT_FAILURE);
@@ -22,13 +23,38 @@ void initCommunication(){
         perror("bind failed");
         exit(EXIT_FAILURE);
     }
-    if (listen(sockfd, 5) < 0) { // maximum number of clients waiting to the queue 5, any new requests gets rejected
+    if (listen(sockfd, 2) < 0) { // maximum number of clients waiting to the queue 5, any new requests gets rejected
         perror("listen");
         exit(EXIT_FAILURE);
     }
+    return sockfd;
 }
 
-char rlAgentCommand(){
+int rlAgentCommand(int sockfd){
+
+    if ((client_socket = accept(sockfd, (struct sockaddr *) &address, (socklen_t *) &addrlen)) < 0) {
+        perror("accept");
+        exit(EXIT_FAILURE);
+    }
+
+    // because comminication is sychronous we respond right away to the correct client using client_socket
+    if ((read_size = read(client_socket, buffer, sizeof(buffer))) < 0) {
+        perror("read from remote peer failed");
+    }
+
+    return client_socket;
+}
+
+void sendStats(int client_socket, double q95){
+
+    send(client_socket, &q95, sizeof q95, 0);
+
+    if (close(client_socket) < 0) { // closing the tcp connection
+        perror("close");
+    }
+}
+
+void closeCommunication(){
 
 }
 

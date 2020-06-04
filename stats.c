@@ -96,10 +96,16 @@ double findQuantile(struct stat* stat, double quantile) {
 
 }//End findQuantile()
 
-void resetStats(){
+void resetStats(struct timeval currentTime){  // NOTE needs the lock
     memset(&global_stats, 0, sizeof(struct memcached_stats));
     global_stats.response_time.min = 1000000;
     global_stats.last_time = currentTime;
+}
+
+double calcStats(){  // NOTE needs the lock
+    double q95 = findQuantile(&global_stats.response_time, .95) * 1000;
+    printf("Percentile: %10f \n", q95);
+    return q95; // in milliseconds
 }
 
 void printGlobalStats(struct config* config) {
@@ -126,7 +132,7 @@ void printGlobalStats(struct config* config) {
   } 
   printf("\n");
   //Reset stats
-  resetStats();
+  resetStats(currentTime);
 
   checkExit(config);
   pthread_mutex_unlock(&stats_lock);
@@ -154,31 +160,31 @@ void statsLoop(struct config* config) {
 }//End statisticsLoop()
 
 
-
 void ipcStatsLoop(struct config* config){
 
-    printf("Entering statsLoop\n");
+    printf("Entering ipcStatsLoop\n");
     pthread_mutex_lock(&stats_lock);
     gettimeofday(&start_time, NULL);
+    struct timeval currentTime;
     pthread_mutex_unlock(&stats_lock);
-    char command;
+    int sockfd, client_socket;
+    double q95;
 
     sleep(2);
+    sockfd = initCommunication();
+
     while(1){
-        command = rlAgentCommand(); // blocking call
+        client_socket = rlAgentCommand(sockfd); // blocking call
         pthread_mutex_lock(&stats_lock);
-        switch (command) {
-            case 'u':
-                resetStats();
-                printf("Start Recording\n");
-                // send ack ?
-                break;
-            case 'd':
-                printf("Stop Recording\n");
-                //calcStats();
-                // send stats
-                break;
-        }
+        gettimeofday(&currentTime, NULL);
+        resetStats(currentTime);
+        pthread_mutex_unlock(&stats_lock);
+        printf("Start Recording\n");
+        sleep(1);
+        printf("Stop Recording\n");
+        pthread_mutex_lock(&stats_lock);
+        q95 = calcStats();
+        sendStats(client_socket, q95);
         checkExit(config);
         pthread_mutex_unlock(&stats_lock);
     }

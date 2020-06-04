@@ -8,10 +8,16 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 
-void initCommunication();
-char rlAgentCommand();
-void sendAck();
-void sendStats();
+#define PORT 8080
+
+int initCommunication();
+int rlAgentCommand(int sockfd);
+void sendStats(int client_socket, double q95);
+void closeCommunication();
 
 #endif //MEMCACHED_CLIENT_COMMUNICATION_H

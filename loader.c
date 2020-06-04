@@ -345,7 +345,7 @@ int main(int argc, char** argv){
 
   setupLoad(config);
   createWorkers(config);
-  statsLoop(config);
+  ipcStatsLoop(config);
   return 0;
 
 }//End main()
