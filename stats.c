@@ -167,26 +167,26 @@ void ipcStatsLoop(struct config* config){
     gettimeofday(&start_time, NULL);
     struct timeval currentTime;
     pthread_mutex_unlock(&stats_lock);
-    int sockfd, client_socket;
+    int sockfd, rlAgent_socket;
     double q95;
 
     sleep(2);
     sockfd = initCommunication();
 
     while(1){
-        client_socket = rlAgentCommand(sockfd); // blocking call
+        rlAgent_socket = rlAgentSync(sockfd); // blocking call
         pthread_mutex_lock(&stats_lock);
         gettimeofday(&currentTime, NULL);
         resetStats(currentTime);
         pthread_mutex_unlock(&stats_lock);
         printf("Start Recording\n");
-        sleep(1);
+        sleep(1);  // TODO acquire sleep interval as configuration
         printf("Stop Recording\n");
         pthread_mutex_lock(&stats_lock);
         q95 = calcStats();
-        sendStats(client_socket, q95);
         checkExit(config);
         pthread_mutex_unlock(&stats_lock);
+        sendStats(rlAgent_socket, q95);  // better out of mutex, to avoid queuing
     }
 } // End ipcStatsLopp
 
