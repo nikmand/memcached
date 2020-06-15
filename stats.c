@@ -96,9 +96,11 @@ double findQuantile(struct stat* stat, double quantile) {
 
 }//End findQuantile()
 
-void resetStats(struct timeval currentTime){  // NOTE needs the lock
+void resetStats(){  // NOTE needs the lock
     memset(&global_stats, 0, sizeof(struct memcached_stats));
     global_stats.response_time.min = 1000000;
+    struct timeval currentTime;
+    gettimeofday(&currentTime, NULL);
     global_stats.last_time = currentTime;
 }
 
@@ -113,8 +115,9 @@ void printGlobalStats(struct config* config) {
   pthread_mutex_lock(&stats_lock);
   struct timeval currentTime;
   gettimeofday(&currentTime, NULL);
-  double timeDiff = currentTime.tv_sec - global_stats.last_time.tv_sec + 1e-6*(currentTime.tv_sec - global_stats.last_time.tv_sec);
-  double rps = global_stats.requests/timeDiff;
+  //double timeDiff =  currentTime.tv_sec - global_stats.last_time.tv_sec + 1e-6*(currentTime.tv_sec - global_stats.last_time.tv_sec); // probable usec
+  double timeDiff =  1e+3*(currentTime.tv_sec - global_stats.last_time.tv_sec) + 1e-3*(currentTime.tv_usec - global_stats.last_time.tv_usec);
+  double rps = global_stats.requests/(timeDiff / 1000.0);
   double std = getStdDev(&global_stats.response_time);
   double q90 = findQuantile(&global_stats.response_time, .90);
   double q95 = findQuantile(&global_stats.response_time, .95);
@@ -132,13 +135,12 @@ void printGlobalStats(struct config* config) {
   } 
   printf("\n");
   //Reset stats
-  resetStats(currentTime);
+  resetStats();
 
   checkExit(config);
   pthread_mutex_unlock(&stats_lock);
 
 }//End printGlobalStats()
-
 
 //Print out statistics every second
 void statsLoop(struct config* config) {
@@ -151,9 +153,10 @@ void statsLoop(struct config* config) {
   sleep(2);
   printf("Stats:\n");
   printf("-------------------------\n");
+  printf("stats_time = %d\n", config->stats_time);
   while(1) {
     printGlobalStats(config);
-    sleep(config->stats_time);
+    usleep(config->stats_time * 1000);
   }//End while()
 
 
@@ -177,16 +180,16 @@ void ipcStatsLoop(struct config* config){
         rlAgent_socket = rlAgentSync(sockfd); // blocking call
         pthread_mutex_lock(&stats_lock);
         gettimeofday(&currentTime, NULL);
-        resetStats(currentTime);
+        resetStats();
         pthread_mutex_unlock(&stats_lock);
         printf("Start Recording\n");
-        sleep(1);  // TODO acquire sleep interval as configuration
+        usleep(config->stats_time * 1000);
         printf("Stop Recording\n");
         pthread_mutex_lock(&stats_lock);
         q95 = calcStats();
         checkExit(config);
         pthread_mutex_unlock(&stats_lock);
-        sendStats(rlAgent_socket, q95);  // better out of mutex, to avoid queuing
+        sendStats(rlAgent_socket, q95);  // better out of mutex, to avoid queuing, q95 is just a number no danger to be changed
     }
 } // End ipcStatsLopp
 

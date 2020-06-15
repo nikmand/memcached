@@ -42,6 +42,7 @@ struct config* parseArgs(int argc, char** argv) {
   struct config* config = malloc(sizeof(struct config));
 
   int ncpus = sysconf(_SC_NPROCESSORS_ONLN);
+  char *ptr_time;
   config->n_cpus = ncpus;
   config->protocol_mode = TCP_MODE;
   config->n_workers = 1;
@@ -193,8 +194,8 @@ struct config* parseArgs(int argc, char** argv) {
         break;
 
       case 'T':
-        config->stats_time = atoi(optarg); 
-        printf("stats_time = %d\n", config->stats_time);    
+        config->stats_time = strtol(optarg, &ptr_time, 10);
+        printf("stats_time = %d\n", config->stats_time);
         break;
 
       case 'w':

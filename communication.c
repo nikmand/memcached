@@ -8,13 +8,21 @@ int sockfd, client_socket, read_size;
 char buffer[1024] = {0};
 struct sockaddr_in address;
 int addrlen = sizeof(address);
+// SO_REUSEADDR
 
-int initCommunication(){
+int initCommunication() {
 
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("socket failed");
         exit(EXIT_FAILURE);
     }
+
+    // in order to avoid error: 'Port already in use'
+    int enable = 1;
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
+        perror("setsockopt(SO_REUSEADDR) failed");
+    }
+
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY; //inet_addr("127.0.0.1");
     address.sin_port = htons(PORT);
@@ -30,7 +38,7 @@ int initCommunication(){
     return sockfd;
 }
 
-int rlAgentCommand(int sockfd){
+int rlAgentSync(int sockfd){
 
     if ((client_socket = accept(sockfd, (struct sockaddr *) &address, (socklen_t *) &addrlen)) < 0) {
         perror("accept");

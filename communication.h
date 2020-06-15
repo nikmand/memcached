@@ -16,7 +16,7 @@
 #define PORT 8080
 
 int initCommunication();
-int rlAgentCommand(int sockfd);
+int rlAgentSync(int sockfd);
 void sendStats(int client_socket, double q95);
 void closeCommunication();
 
