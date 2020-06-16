@@ -65,5 +65,3 @@ void sendStats(int client_socket, double q95){
 void closeCommunication(){
 
 }
-
-

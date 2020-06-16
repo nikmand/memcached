@@ -56,6 +56,7 @@ struct config {
   int random_seed;
   int pre_load;
   int bad_multiget;
+  int report;
 
   uint32_t current_request_uid;
 

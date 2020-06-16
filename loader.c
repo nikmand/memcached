@@ -73,6 +73,7 @@ struct config* parseArgs(int argc, char** argv) {
   config->output_file=NULL;
   config->server_memory=1024;
   config->server_file=NULL;
+  config->report=0;
   int i;
   for(i=0; i<MAX_SERVERS; i++){
     config->server_port[i]=MEMCACHED_PORT;
@@ -210,6 +211,10 @@ struct config* parseArgs(int argc, char** argv) {
       case 'z':
         config->zynga = 1;     
         break;
+
+        case 'Z':
+        config->report = 1;
+        break;
     }
   }
 
@@ -346,7 +351,10 @@ int main(int argc, char** argv){
 
   setupLoad(config);
   createWorkers(config);
-  ipcStatsLoop(config);
+  if (config->report == 1)
+      statsLoop(config);
+  else
+    ipcStatsLoop(config);
   return 0;
 
 }//End main()
