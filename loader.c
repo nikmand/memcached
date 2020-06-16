@@ -81,7 +81,7 @@ struct config* parseArgs(int argc, char** argv) {
   }
 
   int c;
-  while ((c = getopt (argc, argv, "a:c:d:D:ef:g:hi:jk:l:L:m:MnN:o:p:ur:s:S:t:T:w:W:xz")) != -1) {
+  while ((c = getopt (argc, argv, "a:c:d:D:ef:g:hi:jk:l:L:m:MnN:o:p:ur:s:S:t:T:w:W:xz:Z")) != -1) {
     switch (c) {
 
       case 'a':
