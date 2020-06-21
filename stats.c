@@ -106,7 +106,7 @@ void resetStats(){  // NOTE needs the lock
 
 double calcStats(){  // NOTE needs the lock
     double q95 = findQuantile(&global_stats.response_time, .95) * 1000;
-    printf("Percentile: %10f \n", q95);
+    // printf("Percentile: %10f \n", q95);
     return q95; // in milliseconds
 }
 
@@ -166,10 +166,7 @@ void statsLoop(struct config* config) {
 void ipcStatsLoop(struct config* config){
 
     printf("Entering ipcStatsLoop\n");
-    pthread_mutex_lock(&stats_lock);
-    gettimeofday(&start_time, NULL);
-    struct timeval currentTime;
-    pthread_mutex_unlock(&stats_lock);
+    //struct timeval currentTime;
     int sockfd, rlAgent_socket;
     double q95;
 
@@ -179,15 +176,15 @@ void ipcStatsLoop(struct config* config){
     while(1){
         rlAgent_socket = rlAgentSync(sockfd); // blocking call
         pthread_mutex_lock(&stats_lock);
-        gettimeofday(&currentTime, NULL);
+        //gettimeofday(&currentTime, NULL);
         resetStats();
         pthread_mutex_unlock(&stats_lock);
-        printf("Start Recording\n");
-        usleep(config->stats_time * 1000);
+        //printf("Start Recording\n");
+        //usleep(config->stats_time * 1000);
         printf("Stop Recording\n");
         pthread_mutex_lock(&stats_lock);
         q95 = calcStats();
-        checkExit(config);
+        //checkExit(config);
         pthread_mutex_unlock(&stats_lock);
         sendStats(rlAgent_socket, q95);  // better out of mutex, to avoid queuing, q95 is just a number no danger to be changed
     }

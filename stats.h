@@ -26,6 +26,9 @@ struct timeval start_time;
 
 //A single statistic
 struct stat {
+  /*
+   * s_i = sample_value^i, so s0 = count
+   */
   double s0;
   double s1;
   double s2;
