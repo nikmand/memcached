@@ -106,7 +106,7 @@ void resetStats(){  // NOTE needs the lock
 
 double calcStats(){  // NOTE needs the lock
     double q95 = findQuantile(&global_stats.response_time, .95) * 1000;
-    // printf("Percentile: %10f \n", q95);
+    printf("Percentile: %10f \n", q95);
     return q95; // in milliseconds
 }
 
@@ -180,8 +180,8 @@ void ipcStatsLoop(struct config* config){
         resetStats();
         pthread_mutex_unlock(&stats_lock);
         //printf("Start Recording\n");
-        //usleep(config->stats_time * 1000);
-        printf("Stop Recording\n");
+        usleep(config->stats_time * 1000);
+        //printf("Stop Recording\n");
         pthread_mutex_lock(&stats_lock);
         q95 = calcStats();
         //checkExit(config);
