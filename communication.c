@@ -12,7 +12,7 @@ int addrlen = sizeof(address);
 
 int initCommunication() {
 
-    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == 0) { //unix socker? AF_UNIX
         perror("socket failed");
         exit(EXIT_FAILURE);
     }
@@ -21,6 +21,12 @@ int initCommunication() {
     int enable = 1;
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
         perror("setsockopt(SO_REUSEADDR) failed");
+    }
+
+    //Disable nagle's algorithm
+    int flag = 1;
+    if (setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(int)) < 0){
+        perror("couldn't set TCP_NODELAY\n");
     }
 
     address.sin_family = AF_INET;
