@@ -8,7 +8,7 @@ int sockfd, client_socket, read_size;
 char buffer[1024] = {0};
 struct sockaddr_in address;
 int addrlen = sizeof(address);
-// SO_REUSEADDR
+
 
 int initCommunication() {
 
@@ -66,8 +66,4 @@ void sendStats(int client_socket, double q95){
     if (close(client_socket) < 0) { // closing the tcp connection
         perror("close");
     }
-}
-
-void closeCommunication(){
-
 }

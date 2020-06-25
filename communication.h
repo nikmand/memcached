@@ -19,6 +19,5 @@
 int initCommunication();
 int rlAgentSync(int sockfd);
 void sendStats(int client_socket, double q95);
-void closeCommunication();
 
 #endif //MEMCACHED_CLIENT_COMMUNICATION_H
