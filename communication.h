@@ -16,8 +16,13 @@
 
 #define PORT 8080
 
+struct stats{
+    double q95;
+    double rps;
+};
+
 int initCommunication();
 int rlAgentSync(int sockfd);
-void sendStats(int client_socket, double q95);
+void sendStats(int client_socket, struct stats q95);
 
 #endif //MEMCACHED_CLIENT_COMMUNICATION_H

@@ -59,9 +59,9 @@ int rlAgentSync(int sockfd){
     return client_socket;
 }
 
-void sendStats(int client_socket, double q95){
+void sendStats(int client_socket, struct stats requested_stats){
 
-    send(client_socket, &q95, sizeof q95, 0);
+    send(client_socket, &requested_stats, sizeof(struct stats) , 0);
 
     if (close(client_socket) < 0) { // closing the tcp connection
         perror("close");
