@@ -14,11 +14,11 @@
 #include <unistd.h>
 #include <string.h>
 
-#define PORT 8080
+#define PORT 42171
 
 struct stats{
     double q95;
-    double rps;
+    //double rps;
 };
 
 int initCommunication();

@@ -93,6 +93,8 @@ struct int_dist* createConstantDistribution(int constant){
   struct int_dist* dist = malloc(sizeof(struct int_dist));
   int nValues = CDF_VALUES;
   int i;
+
+  printf("Created constant distribution\n");
   for( i = 0; i < nValues; i++ ){
     dist->cdf_y[i] = constant;
   }//End for i
@@ -106,6 +108,8 @@ struct int_dist* createExponentialDistribution(int meanInterarrival) {
   struct int_dist* dist = malloc(sizeof(struct int_dist));
   int nValues = CDF_VALUES;
   int i;
+
+  printf("Created exponential distribution\n");
   for( i = 0; i < nValues; i++ ){
     int value = (int)(-log(1- (double)i/(double)nValues) * meanInterarrival);
     dist->cdf_y[i] = value;
