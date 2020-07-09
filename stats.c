@@ -106,11 +106,11 @@ void resetStats(){  // NOTE needs the lock
 
 struct stats calcStats(){  // NOTE needs the lock
     struct stats requested_stats;
-    //struct timeval currentTime;
-    //gettimeofday(&currentTime, NULL);
-    //double timeDiff =  1e+3*(currentTime.tv_sec - global_stats.last_time.tv_sec) + 1e-3*(currentTime.tv_usec - global_stats.last_time.tv_usec);
+    struct timeval currentTime;
+    gettimeofday(&currentTime, NULL);
+    double timeDiff =  1e+3*(currentTime.tv_sec - global_stats.last_time.tv_sec) + 1e-3*(currentTime.tv_usec - global_stats.last_time.tv_usec);
     requested_stats.q95 = findQuantile(&global_stats.response_time, .95) * 1000; // in milliseconds
-    //requested_stats.rps = global_stats.requests/(timeDiff / 1000.0);
+    requested_stats.rps = global_stats.requests/(timeDiff / 1000.0);
     //printf("Percentile: %10f \n", requested_stats.q95);
     //printf("RPS: %10f \n", requested_stats.rps);
     return requested_stats;

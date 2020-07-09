@@ -18,7 +18,7 @@
 
 struct stats{
     double q95;
-    //double rps;
+    double rps;
 };
 
 int initCommunication();
