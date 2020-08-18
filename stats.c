@@ -64,7 +64,7 @@ void checkExit(struct config* config) {
 
 double findQuantile(struct stat* stat, double quantile) { 
 
-  //Find the 95th-percentile
+  //Find the 95th-quantile
   int nTillQuantile = global_stats.response_time.s0 * quantile;
   int  count = 0;
   int i;
@@ -104,12 +104,12 @@ void resetStats(){  // NOTE needs the lock
     global_stats.last_time = currentTime;
 }
 
-struct stats calcStats(){  // NOTE needs the lock
+struct stats calcStats(double quantile){  // NOTE needs the lock
     struct stats requested_stats;
     struct timeval currentTime;
     gettimeofday(&currentTime, NULL);
     double timeDiff =  1e+3*(currentTime.tv_sec - global_stats.last_time.tv_sec) + 1e-3*(currentTime.tv_usec - global_stats.last_time.tv_usec);
-    requested_stats.q95 = findQuantile(&global_stats.response_time, .95) * 1000; // in milliseconds
+    requested_stats.q95 = findQuantile(&global_stats.response_time, quantile) * 1000; // in milliseconds
     requested_stats.rps = global_stats.requests/(timeDiff / 1000.0);
     //printf("Percentile: %10f \n", requested_stats.q95);
     //printf("RPS: %10f \n", requested_stats.rps);
@@ -190,7 +190,7 @@ void ipcStatsLoop(struct config* config){
         usleep(config->stats_time * 1000);
         //printf("Stop Recording\n");
         pthread_mutex_lock(&stats_lock);
-        requested_stats = calcStats();
+        requested_stats = calcStats(config->quantile);
         //checkExit(config);
         pthread_mutex_unlock(&stats_lock);
         sendStats(rlAgent_socket, requested_stats);  // better out of mutex, to avoid queuing, q95 is just a number no danger to be changed
