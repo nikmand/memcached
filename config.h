@@ -57,6 +57,7 @@ struct config {
   int pre_load;
   int bad_multiget;
   int report;
+  double quantile;
 
   uint32_t current_request_uid;
 

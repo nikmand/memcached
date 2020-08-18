@@ -74,6 +74,7 @@ struct config* parseArgs(int argc, char** argv) {
   config->server_memory=1024;
   config->server_file=NULL;
   config->report=0;
+  config->quantile=.95;
   int i;
   for(i=0; i<MAX_SERVERS; i++){
     config->server_port[i]=MEMCACHED_PORT;
@@ -81,7 +82,7 @@ struct config* parseArgs(int argc, char** argv) {
   }
 
   int c;
-  while ((c = getopt (argc, argv, "a:c:d:D:ef:g:hi:jk:l:L:m:MnN:o:p:ur:s:S:t:T:w:W:xz:Z")) != -1) {
+  while ((c = getopt (argc, argv, "a:c:d:D:ef:g:hi:jk:l:L:m:MnN:o:p:q:ur:s:S:t:T:w:W:xz:Z")) != -1) {
     switch (c) {
 
       case 'a':
@@ -176,6 +177,9 @@ struct config* parseArgs(int argc, char** argv) {
         strcpy(config->output_file, optarg);
         break;
 
+        case 'q':
+        config->quantile = atof(optarg);
+        break;
       case 'r':
         config->rps = atoi(optarg);
         break;
