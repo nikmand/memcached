@@ -179,6 +179,7 @@ struct config* parseArgs(int argc, char** argv) {
 
         case 'q':
         config->quantile = atof(optarg);
+        printf("Quantile selected: %lf\n", config->quantile);
         break;
       case 'r':
         config->rps = atoi(optarg);
